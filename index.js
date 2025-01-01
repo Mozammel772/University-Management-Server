@@ -30,16 +30,13 @@ async function run() {
     const userCollection = client
       .db("University-Management")
       .collection("Register-Users");
-    const categoryCollection = client.db("Repair").collection("Category");
-    const servicepostCollection = client.db("Repair").collection("ServicePost");
-    const servicesCollection = client.db("Repair").collection("Services");
-    const reviweCollection = client.db("Repair").collection("Reviwes");
+
 
     // JWT Authorization
     app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1h",
+        expiresIn: "5m",
       });
       res.send({ token });
     });
@@ -58,40 +55,6 @@ async function run() {
         next();
       });
     };
-
-    // use verify admin after verifyToken
-    const verifyAdmin = async (req, res, next) => {
-      const email = req.decoded.email;
-      const query = { email: email };
-      const user = await userCollection.findOne(query);
-      const isAdmin = user?.role === "admin";
-      if (!isAdmin) {
-        return res.status(403).send({ message: "forbidden access" });
-      }
-      next();
-    };
-
-    // User Email Diye Check Admin Access
-    app.get("/users/admin/:email", verifyToken, async (req, res) => {
-      const email = req.params.email;
-      if (email !== req.decoded.email) {
-        return res.status(403).send({ message: "forbidden access" });
-      }
-      const query = { email: email };
-      const user = await userCollection.findOne(query);
-      let admin = false;
-      if (user) {
-        admin = user?.role === "admin";
-      }
-      res.send({ admin });
-    });
-
-    // all user load form admin dashboard and Verify admin access
-    app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
-      const result = await userCollection.find().toArray();
-      res.send(result);
-    });
-
     // Register user oo Google Login User collection Api Methods
     app.post("/register-users", async (req, res) => {
       const user = req.body;
@@ -109,26 +72,12 @@ async function run() {
       const result = await userCollection.insertOne(newUser);
       res.send(result);
     });
-    //  admin role Update
-    app.patch("/users/admin/:id", async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const updatedDoc = {
-        $set: {
-          role: "admin",
-        },
-      };
-      const result = await userCollection.updateOne(filter, updatedDoc);
-      res.send(result);
-    });
+   
+        // Protected Route
+        app.get("/protected", verifyToken, (req, res) => {
+          res.send({ message: "Welcome to the protected route!", user: req.user });
+        });
 
-    // delete all user from the database for admin
-    app.delete("/users/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await userCollection.deleteOne(query);
-      res.send(result);
-    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
