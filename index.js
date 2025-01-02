@@ -31,7 +31,6 @@ async function run() {
       .db("University-Management")
       .collection("Register-Users");
 
-
     // JWT Authorization
     app.post("/jwt", async (req, res) => {
       const user = req.body;
@@ -64,20 +63,46 @@ async function run() {
         return res.send("User already exists");
       }
       const formattedDate = moment().format("YYYY-MM-DD HH:mm:ss");
+      const imgUrl = "https://i.ibb.co.com/4Vg7qxJ/4042356.png"
       const newUser = {
         createdAt: formattedDate,
         role: "user",
+        imgUrl: imgUrl,
         ...user,
       };
       const result = await userCollection.insertOne(newUser);
       res.send(result);
     });
-   
-        // Protected Route
-        app.get("/protected", verifyToken, (req, res) => {
-          res.send({ message: "Welcome to the protected route!", user: req.user });
-        });
 
+    
+    app.get("/register-users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      console.log(email);
+      const result = await userCollection.findOne(query);
+      if (!result) {
+        return res.status(404).send("User not found");
+      }
+      res.send(result);
+    });
+
+    app.patch("/register-users/:id", async (req, res) => {
+      const id = req.params.id;
+      const { name } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const formattedDate = moment().format("YYYY-MM-DD HH:mm:ss");
+      const updateDoc = {
+        $set: {
+          name: name,
+          updatedAt:formattedDate
+        },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    app.get("/protected", verifyToken, (req, res) => {
+      res.send({ message: "Welcome to the protected route!", user: req.user });
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
