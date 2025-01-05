@@ -35,7 +35,7 @@ async function run() {
     app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "5m",
+        expiresIn: "50m",
       });
       res.send({ token });
     });
@@ -74,7 +74,7 @@ async function run() {
       res.send(result);
     });
 
-    
+
     app.get("/register-users/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
@@ -94,7 +94,7 @@ async function run() {
       const updateDoc = {
         $set: {
           name: name,
-          updatedAt:formattedDate
+          updatedAt: formattedDate
         },
       };
       const result = await userCollection.updateOne(filter, updateDoc);
