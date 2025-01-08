@@ -37,11 +37,7 @@ async function run() {
     app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-<<<<<<< HEAD
         expiresIn: "1h",
-=======
-        expiresIn: "50m",
->>>>>>> 2c68da3d4f16bf93238e43887d66750120e0353f
       });
       res.send({ token });
     });
@@ -233,12 +229,7 @@ async function run() {
       res.send(result);
     });
 
-<<<<<<< HEAD
     app.get("/profile/:email", async (req, res) => {
-=======
-
-    app.get("/register-users/:email", async (req, res) => {
->>>>>>> 2c68da3d4f16bf93238e43887d66750120e0353f
       const email = req.params.email;
       const query = { email: email };
       // console.log("login user", email);
@@ -256,16 +247,11 @@ async function run() {
       const query = { email };
       const updateProfile = {
         $set: {
-<<<<<<< HEAD
           firstName,
           lastName,
           address,
           phone,
           ...(imageUrl && { imgUrl: imageUrl }), // Only update imgUrl if provided
-=======
-          name: name,
-          updatedAt: formattedDate
->>>>>>> 2c68da3d4f16bf93238e43887d66750120e0353f
         },
       };
 
