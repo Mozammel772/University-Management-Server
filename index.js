@@ -240,7 +240,7 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/profile/:email", verifyToken, async (req, res) => {
+    app.patch("/profile/:email", async (req, res) => {
       const email = req.params.email;
       const { firstName, lastName, address, phone, imageUrl } = req.body;
 
